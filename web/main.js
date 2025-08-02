@@ -47,38 +47,10 @@ function uint8ArrayToGuid(arrayBuffer) {
     ].join('-');
 }
 
-const fetchButton = document.getElementById('fetchButton');
-const numberDisplay = document.getElementById('numberDisplay');
-const incrementButton = document.getElementById('incrementButton');
-const counter = document.getElementById('counter');
+const refreshButton = document.getElementById('refreshButton');
 
-fetchButton.onclick = async () => {
+refreshButton.onclick = async () => {
     get();
-    // try {
-    //     const response = await fetch('/.netlify/functions/random-number');
-
-    //     if (response.ok) {
-    //         const data = await response.json();
-    //         numberDisplay.textContent = `Random Number: ${data.number}`;
-    //     } else {
-    //         const data = await response.json();
-    //         if (!data) {
-    //             throw new Error(`Error: Status ${response.status}`);
-    //         }
-    //         if (data.errorType === "Error") {
-    //             throw new Error(`Error ${response.status}: ${data.errorMessage}`);
-    //         }
-    //     }
-
-    // } catch (error) {
-    //     numberDisplay.textContent = `Error: ${error.message}`;
-    // }
-};
-
-let count = 0;
-incrementButton.onclick = () => {
-    count++;
-    counter.textContent = `Count: ${count}`;
 };
 
 async function get() {
@@ -110,8 +82,6 @@ async function get() {
 }
 
 (async function () {
-
-
     let keyPair;
     // Generate and store keys in localStorage if not present
     let privateKeyBase64 = localStorage.getItem('privateKey');
