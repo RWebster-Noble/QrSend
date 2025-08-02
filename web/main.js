@@ -86,6 +86,11 @@ async function get() {
         const publicKeyAsGuid = uint8ArrayToGuid(window.ReverseQR.publicKeyArrayBuffer);
         const response = await fetch(`/.netlify/functions/get?p=${publicKeyAsGuid}`);
 
+        if (response.status === 404) {
+            numberDisplay.textContent = "No data";
+            return;
+        }
+
         if (response.ok) {
             const data = await response.json();
             numberDisplay.textContent = `Random Number: ${data.number}`;
