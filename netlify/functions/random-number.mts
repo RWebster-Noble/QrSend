@@ -34,8 +34,9 @@
 // };
 
 import { getStore } from '@netlify/blobs';
+import { Context } from '@netlify/functions';
 
-export default async function handler(req, context) {
+export default async function handler(request: Request, context: Context) {
     try {
         // const siteID = process.env.NETLIFY_BLOBS_SITE_ID;
         // const token = process.env.NETLIFY_BLOBS_TOKEN;
