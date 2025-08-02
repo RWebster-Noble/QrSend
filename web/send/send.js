@@ -151,7 +151,14 @@ sendButton.onclick = async () => {
         sendResult.style.display = 'inline';
 
         if (response.ok) {
-            sendResult.textContent = `Send successful`;
+            // Change button text to "Sent!" and clear input
+            sendButton.textContent = 'Sent!';
+            inputToSend.value = '';
+
+            // Optionally, reset button text after a short delay
+            setTimeout(() => {
+                sendButton.textContent = 'Send';
+            }, 1500);
         } else {
             const data = await response.json();
             if (!data) {

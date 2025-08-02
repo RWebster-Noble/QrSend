@@ -31,6 +31,28 @@ body {
     color: #333;
     text-decoration: none;
     word-break: break-all;
+    transition: color 0.2s, text-decoration 0.2s, box-shadow 0.2s;
+    background: #f0f6ff;
+    border: 2px solid #0078d7;
+    border-radius: 8px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 12px rgba(0,120,215,0.08);
+    font-weight: 500;
+}
+
+#textDisplay[href] {
+    color: #0078d7;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+#textDisplay[href]:hover {
+    color: #005fa3;
+    text-decoration: underline;
+}
+
+#textDisplay[href]:visited {
+    color: #551A8B;
 }
 
 .page-title {
@@ -82,16 +104,6 @@ body {
 #sendButton:hover {
     background: #005fa3;
 }
-
-#sendResult {
-    display: block;
-    font-size: 1.1rem;
-    color: #0078d7;
-    margin: 18px auto 0 auto;
-    min-height: 24px;
-    word-break: break-all;
-}
-
 
 button {
     background: #0078d7;

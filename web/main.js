@@ -107,6 +107,9 @@ async function get() {
         const response = await fetch(`/.netlify/functions/get?p=${publicKeyAsGuid}`);
 
         if (response.status === 204) {
+            textDisplay.style.display = 'none';
+            const subtitle = document.getElementById('subtitle');
+            if (subtitle) subtitle.style.display = '';
             return;
         }
 
@@ -118,7 +121,17 @@ async function get() {
                 // Decrypt
                 const decrypted = await decryptPayload(payload, window.ReverseQr.privateKey);
                 textDisplay.textContent = decrypted;
-                textDisplay.href = decrypted;
+                textDisplay.style.display = 'block';
+                // Hide subtitle when data is present
+                const subtitle = document.getElementById('subtitle');
+                if (subtitle) subtitle.style.display = 'none';
+                // Check if decrypted is a valid URL
+                try {
+                    const url = new URL(decrypted);
+                    textDisplay.href = url.href;
+                } catch (e) {
+                    textDisplay.removeAttribute('href');
+                }
             } else {
                 
                 throw new Error(`missing or invalid payload structure`);
