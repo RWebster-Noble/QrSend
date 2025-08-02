@@ -5,13 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reverse-QR - Send text backwards via QR code</title>
+    <link rel="stylesheet" href="../style.css">
 </head>
 
 <body>
     <div id="app">
-        <input type="text" id="inputToSend" placeholder="Enter text to send" style="font-size:18px; width:70%; margin-top:20px;">
-        <button id="sendButton" style="font-size:18px; margin-left:10px;">Send</button>
-        <output id="sendResult" style="display:none; font-size:18px; margin-left:10px;"></output>
+        <h1 class="page-title">Reverse-QR</h1>
+        <div class="input-group">
+            <input type="text" id="inputToSend" placeholder="Enter text to send">
+            <button id="sendButton">Send</button>
+        </div>
+        <output id="sendResult"></output>
     </div>
     <script src="send.js" defer></script>
 </body>

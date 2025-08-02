@@ -1,0 +1,118 @@
+#qr-instructions, .qr-instructions {
+    display: block;
+    text-align: center;
+    font-size: 1.05rem;
+    color: #555;
+    margin: 18px auto 0 auto;
+    max-width: 380px;
+    line-height: 1.5;
+}
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #e3eafc 0%, #f7f7f7 100%);
+    margin: 0;
+    padding: 0;
+}
+
+#app {
+    max-width: 480px;
+    margin: 48px auto;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    padding: 40px 32px 32px 32px;
+    text-align: center;
+}
+
+#textDisplay {
+    display: block;
+    font-size: 24px;
+    margin: 20px auto;
+    color: #333;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.page-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #0078d7;
+    letter-spacing: 1px;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 28px;
+}
+
+.input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+#inputToSend {
+    font-size: 1.1rem;
+    padding: 10px 16px;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    width: 65%;
+    transition: border 0.2s;
+    outline: none;
+}
+#inputToSend:focus {
+    border-color: #0078d7;
+}
+
+#sendButton {
+    background: #0078d7;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(0,120,215,0.08);
+}
+#sendButton:hover {
+    background: #005fa3;
+}
+
+#sendResult {
+    display: block;
+    font-size: 1.1rem;
+    color: #0078d7;
+    margin: 18px auto 0 auto;
+    min-height: 24px;
+    word-break: break-all;
+}
+
+
+button {
+    background: #0078d7;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 18px;
+    cursor: pointer;
+    margin: 10px 0;
+    transition: background 0.2s;
+}
+button:hover {
+    background: #005fa3;
+}
+
+#qrcode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 32px auto 0 auto;
+    text-align: center;
+    width: 100%;
+}
