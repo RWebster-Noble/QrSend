@@ -1,2 +1,5 @@
 [build]
 publish = "web"
+
+[functions]
+node_bundler = "esbuild"
