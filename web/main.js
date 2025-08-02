@@ -106,8 +106,7 @@ async function get() {
         const publicKeyAsGuid = await uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
         const response = await fetch(`/.netlify/functions/get?p=${publicKeyAsGuid}`);
 
-        if (response.status === 404) {
-            numberDisplay.textContent = "No data";
+        if (response.status === 204) {
             return;
         }
 
@@ -118,7 +117,8 @@ async function get() {
             if (payload.ephemeralPublicKey && payload.iv && payload.encryptedDataBase64 && window.ReverseQr.privateKey) {
                 // Decrypt
                 const decrypted = await decryptPayload(payload, window.ReverseQr.privateKey);
-                numberDisplay.textContent = `Decrypted: ${decrypted}`;
+                textDisplay.textContent = decrypted;
+                textDisplay.href = decrypted;
             } else {
                 
                 throw new Error(`missing or invalid payload structure`);
@@ -134,7 +134,7 @@ async function get() {
         }
 
     } catch (error) {
-        numberDisplay.textContent = `Error: ${error.message}`;
+        textDisplay.textContent = `Error: ${error.message}`;
     }
 }
 

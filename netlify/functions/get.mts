@@ -28,12 +28,8 @@ export default async function handler(request: Request, context: Context) {
     const data = await store.get(id);
 
     if (data === undefined || data === null) {
-        return new Response(JSON.stringify({
-            errorType: "Error",
-            errorMessage: "No data found"
-        }), {
-            status: 404,
-            headers: { 'Content-Type': 'application/json' }
+        return new Response(null, {
+            status: 204
         });
     }
 
