@@ -37,13 +37,13 @@ import { getStore } from '@netlify/blobs';
 
 export default async function handler(req, context) {
     try {
-        const siteID = process.env.NETLIFY_BLOBS_SITE_ID;
-        const token = process.env.NETLIFY_BLOBS_TOKEN;
+        // const siteID = process.env.NETLIFY_BLOBS_SITE_ID;
+        // const token = process.env.NETLIFY_BLOBS_TOKEN;
         const store = getStore({
             name: 'numbers',
-            consistency: 'strong',
-            siteID,
-            token
+            consistency: 'strong'//,
+            // siteID,
+            // token
         });
         // Generate random number between 1 and 100
         const randomNumber = Math.floor(Math.random() * 100) + 1;
@@ -55,17 +55,17 @@ export default async function handler(req, context) {
 
         await store.setJSON(randomNumber.toString(), randomNumberResponse);
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify(randomNumberResponse)
-        };
+        return new Response(JSON.stringify(randomNumberResponse), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+        });
     } catch (error) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ 
-                error: 'Failed to generate random number',
-                message: error.message
-            })
-        };
+        return new Response(JSON.stringify({
+            error: 'Failed to generate random number',
+            message: error.message
+        }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
 };
