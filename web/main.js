@@ -1,4 +1,4 @@
-window.ReverseQR = window.ReverseQR || {};
+window.ReverseQr = window.ReverseQr || {};
 
 // Convert ArrayBuffer to Base64 string
 function arrayBufferToBase64(arrayBuffer) {
@@ -53,9 +53,57 @@ refreshButton.onclick = async () => {
     get();
 };
 
+async function decryptPayload(payload, privateKey) {
+    // Import ephemeral public key
+    const ephemeralPublicKeyArrayBuffer = base64ToArrayBuffer(payload.ephemeralPublicKey);
+    const ephemeralPublicKey = await window.crypto.subtle.importKey(
+        "spki",
+        ephemeralPublicKeyArrayBuffer,
+        {
+            name: "ECDH",
+            namedCurve: "P-256"
+        },
+        true,
+        []
+    );
+
+    // Derive shared secret
+    const aesKey = await window.crypto.subtle.deriveKey(
+        {
+            name: "ECDH",
+            public: ephemeralPublicKey
+        },
+        privateKey,
+        {
+            name: "AES-GCM",
+            length: 256
+        },
+        false,
+        ["decrypt"]
+    );
+
+    // Decode IV and ciphertext
+    const iv = new Uint8Array(base64ToArrayBuffer(payload.iv));
+    const encryptedData = base64ToArrayBuffer(payload.data);
+
+    // Decrypt
+    const decryptedArrayBuffer = await window.crypto.subtle.decrypt(
+        {
+            name: "AES-GCM",
+            iv: iv
+        },
+        aesKey,
+        encryptedData
+    );
+
+    // Convert decrypted ArrayBuffer to string
+    const decoder = new TextDecoder();
+    return decoder.decode(decryptedArrayBuffer);
+}
+
 async function get() {
     try {
-        const publicKeyAsGuid = uint8ArrayToGuid(window.ReverseQR.publicKeyArrayBuffer);
+        const publicKeyAsGuid = uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
         const response = await fetch(`/.netlify/functions/get?p=${publicKeyAsGuid}`);
 
         if (response.status === 404) {
@@ -65,7 +113,15 @@ async function get() {
 
         if (response.ok) {
             const data = await response.json();
-            numberDisplay.textContent = `Random Number: ${data.data}`;
+            // Check if payload is encrypted
+            if (data.ephemeralPublicKey && data.iv && data.data && window.ReverseQr.privateKey) {
+                // Decrypt
+                const decrypted = await decryptPayload(data, window.ReverseQr.privateKey);
+                numberDisplay.textContent = `Decrypted: ${decrypted}`;
+            } else {
+                
+                throw new Error(`missing or invalid payload structure`);
+            }
         } else {
             const data = await response.json();
             if (!data) {
@@ -83,16 +139,17 @@ async function get() {
 
 (async function () {
     let keyPair;
-    // Generate and store keys in localStorage if not present
     let privateKeyBase64 = localStorage.getItem('privateKey');
     let publicKeyBase64 = localStorage.getItem('publicKey');
 
-
     if (!privateKeyBase64 || !publicKeyBase64) {
         keyPair = await window.crypto.subtle.generateKey(
-            { name: "Ed25519" },
+            {
+                name: "ECDH",
+                namedCurve: "P-256"
+            },
             true,
-            ["sign", "verify"]
+            ["deriveKey", "deriveBits"]
         );
         // Export and store private key
         const privateKeyArrayBuffer = await window.crypto.subtle.exportKey(
@@ -108,7 +165,7 @@ async function get() {
             keyPair.publicKey
         );
         publicKeyBase64 = arrayBufferToBase64(publicKeyArrayBuffer);
-        window.ReverseQR.publicKeyArrayBuffer = publicKeyArrayBuffer;
+        window.ReverseQr.publicKeyArrayBuffer = publicKeyArrayBuffer;
         localStorage.setItem('publicKey', publicKeyBase64);
     } else {
         // Import private key
@@ -116,21 +173,28 @@ async function get() {
         const privateKey = await window.crypto.subtle.importKey(
             "pkcs8",
             privateKeyArrayBuffer,
-            { name: "Ed25519" },
+            {
+                name: "ECDH",
+                namedCurve: "P-256"
+            },
             true,
-            ["sign"]
+            ["deriveKey", "deriveBits"]
         );
         // Import public key
         const publicKeyArrayBuffer = base64ToArrayBuffer(publicKeyBase64);
         const publicKey = await window.crypto.subtle.importKey(
             "spki",
             publicKeyArrayBuffer,
-            { name: "Ed25519" },
+            {
+                name: "ECDH",
+                namedCurve: "P-256"
+            },
             true,
-            ["verify"]
+            []
         );
-        window.ReverseQR.publicKeyArrayBuffer = publicKeyArrayBuffer;
+        window.ReverseQr.publicKeyArrayBuffer = publicKeyArrayBuffer;
         keyPair = { privateKey, publicKey };
+        window.ReverseQr.privateKey = privateKey; // <-- Save for decryption
     }
 
     const urlsafePublicKeyBase64 = publicKeyBase64
@@ -151,5 +215,3 @@ async function get() {
 
     get();
 })();
-
-

@@ -1,4 +1,4 @@
-window.ReverseQR = window.ReverseQR || {};
+window.ReverseQr = window.ReverseQr || {};
 
 const inputToSend = document.getElementById('inputToSend');
 const sendButton = document.getElementById('sendButton');
@@ -35,29 +35,111 @@ function base64ToArrayBuffer(base64String) {
     return uint8Array.buffer;
 }
 
+function arrayBufferToBase64(arrayBuffer) {
+    // Create a Uint8Array view of the ArrayBuffer
+    const uint8Array = new Uint8Array(arrayBuffer);
+
+    // Use String.fromCharCode to convert each byte to a character
+    const charArray = Array.from(uint8Array).map(byte => String.fromCharCode(byte));
+
+    // Join the characters into a string and apply btoa()
+    return btoa(charArray.join(''));
+}
+
 sendButton.onclick = async () => {
+
+    // Get public key base64 from URL hash
+    if (!location.hash || location.hash.length < 2) {
+        throw new Error('Missing public key in URL hash');
+    }
+    let publicKeyBase64 = location.hash.slice(1);
+
+    // Check if publicKeyBase64 is valid base64 (URL-safe or standard)
+    if (!/^[A-Za-z0-9\-_]+$/.test(publicKeyBase64)) {
+        throw new Error('Invalid public key format in URL hash');
+    }
+
+    // Undo URL-safe Base64 encoding
+    publicKeyBase64 = publicKeyBase64
+        .replace(/-/g, '+')
+        .replace(/_/g, '/')
+        .padEnd(publicKeyBase64.length + (4 - publicKeyBase64.length % 4) % 4, '=');
+    // Convert base64 to ArrayBuffer
+    const publicKeyArrayBuffer = base64ToArrayBuffer(publicKeyBase64);
+
+    // Import recipient's public ECDH key
+    const recipientPublicKey = await window.crypto.subtle.importKey(
+        "spki",
+        publicKeyArrayBuffer,
+        {
+            name: "ECDH",
+            namedCurve: "P-256"
+        },
+        true,
+        []
+    );
+
+    // Generate ephemeral ECDH key pair
+    const ephemeralKeyPair = await window.crypto.subtle.generateKey(
+        {
+            name: "ECDH",
+            namedCurve: "P-256"
+        },
+        true,
+        ["deriveKey", "deriveBits"]
+    );
+
+    // Derive shared secret
+    const aesKey = await window.crypto.subtle.deriveKey(
+        {
+            name: "ECDH",
+            public: recipientPublicKey
+        },
+        ephemeralKeyPair.privateKey,
+        {
+            name: "AES-GCM",
+            length: 256
+        },
+        true,
+        ["encrypt", "decrypt"]
+    );
+
+    // Encrypt the data
+    const encoder = new TextEncoder();
+    const encodedData = encoder.encode(inputToSend.value);
+
+    // Generate random IV for AES-GCM
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+
+    const encryptedData = await window.crypto.subtle.encrypt(
+        {
+            name: "AES-GCM",
+            iv: iv
+        },
+        aesKey,
+        encodedData
+    );
+
+    // Export ephemeral public key
+    const ephemeralPublicKeyArrayBuffer = await window.crypto.subtle.exportKey(
+        "spki",
+        ephemeralKeyPair.publicKey
+    );
+    const ephemeralPublicKeyBase64 = arrayBufferToBase64(ephemeralPublicKeyArrayBuffer);
+    const ivBase64 = arrayBufferToBase64(iv);
+    const encryptedBase64Data = arrayBufferToBase64(encryptedData);
+
+    // Convert ArrayBuffer to GUID for endpoint
+    const id = uint8ArrayToGuid(publicKeyArrayBuffer);
+
+    // Send ephemeral public key, IV, and ciphertext
+    const payload = {
+        ephemeralPublicKey: ephemeralPublicKeyBase64,
+        iv: ivBase64,
+        data: encryptedBase64Data
+    };
+
     try {
-        // Get public key base64 from URL hash
-        if (!location.hash || location.hash.length < 2) {
-            throw new Error('Missing public key in URL hash');
-        }
-        let publicKeyBase64 = location.hash.slice(1);
-
-        // Check if publicKeyBase64 is valid base64 (URL-safe or standard)
-        if (!/^[A-Za-z0-9\-_]+$/.test(publicKeyBase64)) {
-            throw new Error('Invalid public key format in URL hash');
-        }
-        // Undo URL-safe Base64 encoding
-        publicKeyBase64 = publicKeyBase64
-            .replace(/-/g, '+')
-            .replace(/_/g, '/')
-            .padEnd(publicKeyBase64.length + (4 - publicKeyBase64.length % 4) % 4, '=');
-        // Convert base64 to ArrayBuffer
-        const publicKeyArrayBuffer = base64ToArrayBuffer(publicKeyBase64);
-        // Convert ArrayBuffer to GUID
-        const id = uint8ArrayToGuid(publicKeyArrayBuffer);
-
-        const payload = { data: inputToSend.value };
         const response = await fetch(`/.netlify/functions/send/${id}`, {
             method: 'POST',
             headers: {
@@ -85,95 +167,5 @@ sendButton.onclick = async () => {
         sendResult.textContent = `Error: ${error.message}`;
     }
 };
-
-(async function () {
-    // Convert ArrayBuffer to Base64 string
-    function arrayBufferToBase64(arrayBuffer) {
-        // Create a Uint8Array view of the ArrayBuffer
-        const uint8Array = new Uint8Array(arrayBuffer);
-
-        // Use String.fromCharCode to convert each byte to a character
-        const charArray = Array.from(uint8Array).map(byte => String.fromCharCode(byte));
-
-        // Join the characters into a string and apply btoa()
-        return btoa(charArray.join(''));
-    }
-
-    // Convert Base64 string back to ArrayBuffer
-    function base64ToArrayBuffer(base64String) {
-        // Convert Base64 to binary string
-        const binaryString = atob(base64String);
-
-        // Create Uint8Array from the binary string
-        const uint8Array = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-            uint8Array[i] = binaryString.charCodeAt(i);
-        }
-
-        return uint8Array.buffer;
-    }
-
-    let keyPair;
-    // Generate and store keys in localStorage if not present
-    let privateKeyBase64 = localStorage.getItem('privateKey');
-    let publicKeyBase64 = localStorage.getItem('publicKey');
-
-
-    if (!privateKeyBase64 || !publicKeyBase64) {
-        keyPair = await window.crypto.subtle.generateKey(
-            { name: "Ed25519" },
-            true,
-            ["sign", "verify"]
-        );
-        // Export and store private key
-        const privateKeyArrayBuffer = await window.crypto.subtle.exportKey(
-            "pkcs8",
-            keyPair.privateKey
-        );
-        privateKeyBase64 = arrayBufferToBase64(privateKeyArrayBuffer);
-        localStorage.setItem('privateKey', privateKeyBase64);
-
-        // Export and store public key
-        const publicKeyArrayBuffer = await window.crypto.subtle.exportKey(
-            "spki",
-            keyPair.publicKey
-        );
-        publicKeyBase64 = arrayBufferToBase64(publicKeyArrayBuffer);
-        localStorage.setItem('publicKey', publicKeyBase64);
-    } else {
-        // Import private key
-        const privateKeyArrayBuffer = base64ToArrayBuffer(privateKeyBase64);
-        const privateKey = await window.crypto.subtle.importKey(
-            "pkcs8",
-            privateKeyArrayBuffer,
-            { name: "Ed25519" },
-            true,
-            ["sign"]
-        );
-        // Import public key
-        const publicKeyArrayBuffer = base64ToArrayBuffer(publicKeyBase64);
-        const publicKey = await window.crypto.subtle.importKey(
-            "spki",
-            publicKeyArrayBuffer,
-            { name: "Ed25519" },
-            true,
-            ["verify"]
-        );
-        keyPair = { privateKey, publicKey };
-    }
-
-    window.ReverseQR.keyPair = keyPair;
-    
-    const qrCodeUrl = `${window.location.href}/send?p=${publicKeyBase64}`;
-    console.log("QR Code URL:", qrCodeUrl);
-    new QRCode(document.getElementById("qrcode"), {
-        text: qrCodeUrl,
-        width: 128,
-        height: 128,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.M
-    });
-})();
 
 
