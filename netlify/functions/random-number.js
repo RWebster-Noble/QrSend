@@ -35,7 +35,7 @@
 
 import { getStore } from '@netlify/blobs';
 
-exports.handler = async (event) => {
+export default async function handler(req, context) {
     try {
         const siteID = process.env.NETLIFY_BLOBS_SITE_ID;
         const token = process.env.NETLIFY_BLOBS_TOKEN;
