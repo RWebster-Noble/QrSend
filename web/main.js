@@ -1,4 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Generate and store userId in a cookie if not present
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    let userId = getCookie('userId');
+    if (!userId) {
+        userId = crypto.randomUUID();
+        // Set cookie: store-only, SameSite=Strict, Secure
+        document.cookie = `userId=${userId}; path=/; SameSite=Strict; Secure`;
+    }
+    
     const app = document.getElementById('app');
     
     // Display elements
