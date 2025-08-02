@@ -12,13 +12,20 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchButton.onclick = async () => {
         try {
             const response = await fetch('/.netlify/functions/random-number');
-            const data = await response.json();
-            
-            if (data.error) {
-                throw new Error(data.message);
+
+            if (response.ok) {
+                const data = await response.json();
+                numberDisplay.textContent = `Random Number: ${data.number}`;
+            } else {
+                const data = await response.json();
+                if (!data) {
+                    throw new Error(`Error: Status ${response.status}`);
+                }
+                if (data.errorType === "Error") {
+                    throw new Error(`Error ${response.status}: ${data.errorMessage}`);
+                }
             }
-            
-            numberDisplay.textContent = `Random Number: ${data.number}`;
+
         } catch (error) {
             numberDisplay.textContent = `Error: ${error.message}`;
         }
