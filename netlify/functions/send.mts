@@ -1,6 +1,5 @@
 import { getStore } from '@netlify/blobs';
 import { Context } from '@netlify/functions';
-import randomNumber from './random-number.mts';
 
 export default async function handler(request: Request, context: Context) {
     if (request.method !== 'POST') {

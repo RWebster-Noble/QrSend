@@ -31,12 +31,12 @@ function uint8ArrayToGuid(arrayBuffer) {
     if (uint8Array.byteLength < 16) {
         throw new Error('Uint8Array must be at least 16 bytes for a valid GUID');
     }
-    
+
     // Convert bytes to hex string
     const hex = Array.from(uint8Array.slice(0, 16))
         .map(b => b.toString(16).padStart(2, '0'))
         .join('');
-    
+
     // Format as GUID (8-4-4-4-12)
     return [
         hex.substring(0, 8),
@@ -157,8 +157,13 @@ async function get() {
         window.ReverseQR.publicKeyArrayBuffer = publicKeyArrayBuffer;
         keyPair = { privateKey, publicKey };
     }
-    
-    const qrCodeUrl = `${window.location.href}/send#${publicKeyBase64}`;
+
+    const urlsafePublicKeyBase64 = publicKeyBase64
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=/g, '');
+
+    const qrCodeUrl = `${window.location.href}send#${urlsafePublicKeyBase64}`;
     console.log("QR Code URL:", qrCodeUrl);
     new QRCode(document.getElementById("qrcode"), {
         text: qrCodeUrl,
