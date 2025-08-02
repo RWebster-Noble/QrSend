@@ -57,6 +57,10 @@ sendButton.onclick = async () => {
         return;
     }
 
+    // Set button to "Sending..." and disable
+    sendButton.textContent = 'Sending';
+    sendButton.disabled = true;
+
     // Get public key base64 from URL hash
     if (!location.hash || location.hash.length < 2) {
         throw new Error('Missing public key in URL hash');
@@ -159,6 +163,7 @@ sendButton.onclick = async () => {
             // Change button text to "Sent!" and clear input
             sendButton.textContent = 'Sent!';
             inputToSend.value = '';
+            sendButton.disabled = false;
 
             // Add animation class
             sendButton.classList.add('sent-animate');
@@ -167,7 +172,8 @@ sendButton.onclick = async () => {
             setTimeout(() => {
                 sendButton.classList.remove('sent-animate');
                 sendButton.textContent = 'Send';
-            }, 600);
+                sendButton.disabled = false;
+            }, 1500);
         } else {
             const data = await response.json();
             if (!data) {
@@ -180,6 +186,7 @@ sendButton.onclick = async () => {
 
     } catch (error) {
         sendButton.textContent = 'Error!';
+        sendButton.disabled = false;
         throw error;
     }
 };
