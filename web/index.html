@@ -1,12 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minimal Netlify App with Serverless Function</title>
 </head>
+
 <body>
-    <div id="app"></div>
-    <script src="main.js"></script>
+    <div id="app">
+        <button id="fetchButton">Get Random Number</button>
+        <div id="numberDisplay" style="font-size:24px; margin-top:20px;"></div>
+        <button id="incrementButton">Increment</button>
+        <div id="counter" style="font-size:24px; margin-top:20px;"></div>
+    </div>
+    <div id="qrcode"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+        integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="main.js" defer></script>
 </body>
+
 </html>
