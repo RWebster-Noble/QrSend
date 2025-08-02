@@ -4,10 +4,60 @@ const inputToSend = document.getElementById('inputToSend');
 const sendButton = document.getElementById('sendButton');
 const sendResult = document.getElementById('sendResult');
 
+function uint8ArrayToGuid(arrayBuffer) {
+    const uint8Array = new Uint8Array(arrayBuffer);
+    if (uint8Array.byteLength < 16) {
+        throw new Error('Uint8Array must be at least 16 bytes for a valid GUID');
+    }
+    const hex = Array.from(uint8Array.slice(0, 16))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+    return [
+        hex.substring(0, 8),
+        hex.substring(8, 12),
+        hex.substring(12, 16),
+        hex.substring(16, 20),
+        hex.substring(20, 32)
+    ].join('-');
+}
+
+// Convert Base64 string back to ArrayBuffer
+function base64ToArrayBuffer(base64String) {
+    // Convert Base64 to binary string
+    const binaryString = atob(base64String);
+
+    // Create Uint8Array from the binary string
+    const uint8Array = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+        uint8Array[i] = binaryString.charCodeAt(i);
+    }
+
+    return uint8Array.buffer;
+}
+
 sendButton.onclick = async () => {
     try {
+        // Get public key base64 from URL hash
+        if (!location.hash || location.hash.length < 2) {
+            throw new Error('Missing public key in URL hash');
+        }
+        let publicKeyBase64 = location.hash.slice(1);
+
+        // Check if publicKeyBase64 is valid base64 (URL-safe or standard)
+        if (!/^[A-Za-z0-9\-_]+$/.test(publicKeyBase64)) {
+            throw new Error('Invalid public key format in URL hash');
+        }
+        // Undo URL-safe Base64 encoding
+        publicKeyBase64 = publicKeyBase64
+            .replace(/-/g, '+')
+            .replace(/_/g, '/')
+            .padEnd(publicKeyBase64.length + (4 - publicKeyBase64.length % 4) % 4, '=');
+        // Convert base64 to ArrayBuffer
+        const publicKeyArrayBuffer = base64ToArrayBuffer(publicKeyBase64);
+        // Convert ArrayBuffer to GUID
+        const id = uint8ArrayToGuid(publicKeyArrayBuffer);
+
         const payload = { data: inputToSend.value };
-        const id = location.hash.slice(1);
         const response = await fetch(`/.netlify/functions/send/${id}`, {
             method: 'POST',
             headers: {
