@@ -167,6 +167,7 @@ async function get() {
         );
         publicKeyBase64 = arrayBufferToBase64(publicKeyArrayBuffer);
         window.ReverseQr.publicKeyArrayBuffer = publicKeyArrayBuffer;
+        window.ReverseQr.privateKey = keyPair.privateKey;
         localStorage.setItem('publicKey', publicKeyBase64);
     } else {
         // Import private key
