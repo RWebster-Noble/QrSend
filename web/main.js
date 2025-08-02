@@ -84,7 +84,7 @@ async function decryptPayload(payload, privateKey) {
 
     // Decode IV and ciphertext
     const iv = new Uint8Array(base64ToArrayBuffer(payload.iv));
-    const encryptedData = base64ToArrayBuffer(payload.data);
+    const encryptedData = base64ToArrayBuffer(payload.encryptedDataBase64);
 
     // Decrypt
     const decryptedArrayBuffer = await window.crypto.subtle.decrypt(
@@ -112,11 +112,12 @@ async function get() {
         }
 
         if (response.ok) {
-            const data = await response.json();
+            const responseJson = await response.json();
+            const payload = JSON.parse(responseJson.data);
             // Check if payload is encrypted
-            if (data.ephemeralPublicKey && data.iv && data.data && window.ReverseQr.privateKey) {
+            if (payload.ephemeralPublicKey && payload.iv && payload.encryptedDataBase64 && window.ReverseQr.privateKey) {
                 // Decrypt
-                const decrypted = await decryptPayload(data, window.ReverseQr.privateKey);
+                const decrypted = await decryptPayload(payload, window.ReverseQr.privateKey);
                 numberDisplay.textContent = `Decrypted: ${decrypted}`;
             } else {
                 

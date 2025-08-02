@@ -14,7 +14,7 @@ export default async function handler(request: Request, context: Context) {
 
     let body;
     try {
-        body = await request.json();
+        body = await request.body;
     } catch (e) {
         return new Response(JSON.stringify({
             errorType: "Error",
@@ -25,10 +25,10 @@ export default async function handler(request: Request, context: Context) {
         });
     }
 
-    if (!body || typeof body.data !== 'string') {
+    if (!body) {
         return new Response(JSON.stringify({
             errorType: "Error",
-            errorMessage: "Missing or invalid 'data' field"
+            errorMessage: "Missing request body"
         }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' }
@@ -52,12 +52,11 @@ export default async function handler(request: Request, context: Context) {
             headers: { 'Content-Type': 'application/json' }
         });
     }
-    await store.set(id, body.data);
+    await store.set(id, body);
     // For now, just return a success response.
     return new Response(JSON.stringify({
         success: true,
         message: "Data received",
-        received: body.data
     }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }

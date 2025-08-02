@@ -127,16 +127,14 @@ sendButton.onclick = async () => {
     );
     const ephemeralPublicKeyBase64 = arrayBufferToBase64(ephemeralPublicKeyArrayBuffer);
     const ivBase64 = arrayBufferToBase64(iv);
-    const encryptedBase64Data = arrayBufferToBase64(encryptedData);
+    const encryptedDataBase64 = arrayBufferToBase64(encryptedData);
 
     // Convert ArrayBuffer to GUID for endpoint
     const id = uint8ArrayToGuid(publicKeyArrayBuffer);
-
-    // Send ephemeral public key, IV, and ciphertext
     const payload = {
         ephemeralPublicKey: ephemeralPublicKeyBase64,
         iv: ivBase64,
-        data: encryptedBase64Data
+        encryptedDataBase64: encryptedDataBase64
     };
 
     try {
