@@ -158,7 +158,7 @@ async function get() {
         keyPair = { privateKey, publicKey };
     }
     
-    const qrCodeUrl = `${window.location.href}/send?p=${publicKeyBase64}`;
+    const qrCodeUrl = `${window.location.href}/send#${publicKeyBase64}`;
     console.log("QR Code URL:", qrCodeUrl);
     new QRCode(document.getElementById("qrcode"), {
         text: qrCodeUrl,
