@@ -86,12 +86,6 @@ sendButton.onclick = async () => {
     }
 };
 
-let count = 0;
-incrementButton.onclick = () => {
-    count++;
-    counter.textContent = `Count: ${count}`;
-};
-
 (async function () {
     // Convert ArrayBuffer to Base64 string
     function arrayBufferToBase64(arrayBuffer) {
