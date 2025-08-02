@@ -1,6 +1,5 @@
 const inputToSend = document.getElementById('inputToSend');
 const sendButton = document.getElementById('sendButton');
-const sendResult = document.getElementById('sendResult');
 
 async function uint8ArrayToGuid(arrayBuffer) {
     if (arrayBuffer.byteLength < 16) {
@@ -49,6 +48,14 @@ function arrayBufferToBase64(arrayBuffer) {
 }
 
 sendButton.onclick = async () => {
+    // Block sending if the text is empty
+    if (!inputToSend.value.trim()) {
+        sendButton.textContent = 'Empty!';
+        setTimeout(() => {
+            sendButton.textContent = 'Send';
+        }, 1500);
+        return;
+    }
 
     // Get public key base64 from URL hash
     if (!location.hash || location.hash.length < 2) {
@@ -148,17 +155,19 @@ sendButton.onclick = async () => {
             body: JSON.stringify(payload)
         });
 
-        sendResult.style.display = 'inline';
-
         if (response.ok) {
             // Change button text to "Sent!" and clear input
             sendButton.textContent = 'Sent!';
             inputToSend.value = '';
 
-            // Optionally, reset button text after a short delay
+            // Add animation class
+            sendButton.classList.add('sent-animate');
+
+            // Remove animation class after animation ends (e.g. 600ms)
             setTimeout(() => {
+                sendButton.classList.remove('sent-animate');
                 sendButton.textContent = 'Send';
-            }, 1500);
+            }, 600);
         } else {
             const data = await response.json();
             if (!data) {
@@ -170,8 +179,8 @@ sendButton.onclick = async () => {
         }
 
     } catch (error) {
-        sendResult.style.display = 'inline';
-        sendResult.textContent = `Error: ${error.message}`;
+        sendButton.textContent = 'Error!';
+        throw error;
     }
 };
 
