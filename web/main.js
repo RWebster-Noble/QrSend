@@ -93,7 +93,7 @@ async function get() {
 
         if (response.ok) {
             const data = await response.json();
-            numberDisplay.textContent = `Random Number: ${data.number}`;
+            numberDisplay.textContent = `Random Number: ${data.data}`;
         } else {
             const data = await response.json();
             if (!data) {
