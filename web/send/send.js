@@ -1,14 +1,16 @@
-window.ReverseQr = window.ReverseQr || {};
-
 const inputToSend = document.getElementById('inputToSend');
 const sendButton = document.getElementById('sendButton');
 const sendResult = document.getElementById('sendResult');
 
-function uint8ArrayToGuid(arrayBuffer) {
-    const uint8Array = new Uint8Array(arrayBuffer);
-    if (uint8Array.byteLength < 16) {
-        throw new Error('Uint8Array must be at least 16 bytes for a valid GUID');
+async function uint8ArrayToGuid(arrayBuffer) {
+    if (arrayBuffer.byteLength < 16) {
+        throw new Error('We need at least 16 bytes for a GUID');
     }
+
+    // Compute SHA-1 hash of the input
+    const hashBuffer = await window.crypto.subtle.digest('SHA-1', arrayBuffer);
+    const uint8Array = new Uint8Array(hashBuffer);
+
     const hex = Array.from(uint8Array.slice(0, 16))
         .map(b => b.toString(16).padStart(2, '0'))
         .join('');
@@ -130,7 +132,7 @@ sendButton.onclick = async () => {
     const encryptedDataBase64 = arrayBufferToBase64(encryptedData);
 
     // Convert ArrayBuffer to GUID for endpoint
-    const id = uint8ArrayToGuid(publicKeyArrayBuffer);
+    const id = await uint8ArrayToGuid(publicKeyArrayBuffer);
     const payload = {
         ephemeralPublicKey: ephemeralPublicKeyBase64,
         iv: ivBase64,

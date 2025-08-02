@@ -26,18 +26,18 @@ function base64ToArrayBuffer(base64String) {
     return uint8Array.buffer;
 }
 
-function uint8ArrayToGuid(arrayBuffer) {
-    const uint8Array = new Uint8Array(arrayBuffer);
-    if (uint8Array.byteLength < 16) {
-        throw new Error('Uint8Array must be at least 16 bytes for a valid GUID');
+async function uint8ArrayToGuid(arrayBuffer) {
+    if (arrayBuffer.byteLength < 16) {
+        throw new Error('We need at least 16 bytes for a GUID');
     }
 
-    // Convert bytes to hex string
+    // Compute SHA-1 hash of the input
+    const hashBuffer = await window.crypto.subtle.digest('SHA-1', arrayBuffer);
+    const uint8Array = new Uint8Array(hashBuffer);
+
     const hex = Array.from(uint8Array.slice(0, 16))
         .map(b => b.toString(16).padStart(2, '0'))
         .join('');
-
-    // Format as GUID (8-4-4-4-12)
     return [
         hex.substring(0, 8),
         hex.substring(8, 12),
@@ -103,7 +103,7 @@ async function decryptPayload(payload, privateKey) {
 
 async function get() {
     try {
-        const publicKeyAsGuid = uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
+        const publicKeyAsGuid = await uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
         const response = await fetch(`/.netlify/functions/get?p=${publicKeyAsGuid}`);
 
         if (response.status === 404) {
