@@ -242,4 +242,5 @@ async function get() {
     });
 
     get();
+    setInterval(get, 1000);
 })();
