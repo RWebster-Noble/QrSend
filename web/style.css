@@ -27,7 +27,7 @@ body {
     text-align: center;
 }
 
-#textDisplay {
+.text-display {
     display: block;
     font-size: 24px;
     margin: 20px auto;
@@ -43,18 +43,18 @@ body {
     font-weight: 500;
 }
 
-#textDisplay[href] {
+.text-display[href] {
     color: #0078d7;
     text-decoration: underline;
     cursor: pointer;
 }
 
-#textDisplay[href]:hover {
+.text-display[href]:hover {
     color: #005fa3;
     text-decoration: underline;
 }
 
-#textDisplay[href]:visited {
+.text-display[href]:visited {
     color: #551A8B;
 }
 

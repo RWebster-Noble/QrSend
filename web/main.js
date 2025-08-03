@@ -127,7 +127,7 @@ async function get() {
                 if (decrypted !== lastDecrypted) {
                     // Add new textDisplay element
                     const newTextDisplay = document.createElement('a');
-                    newTextDisplay.className = 'textDisplay';
+                    newTextDisplay.className = 'text-display';
                     newTextDisplay.textContent = decrypted;
                     newTextDisplay.style.display = 'block';
                     // Check if decrypted is a valid URL
