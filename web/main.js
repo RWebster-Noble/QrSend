@@ -101,6 +101,8 @@ async function decryptPayload(payload, privateKey) {
     return decoder.decode(decryptedArrayBuffer);
 }
 
+let lastDecrypted = null;
+
 async function get() {
     try {
         const publicKeyAsGuid = await uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
@@ -110,6 +112,7 @@ async function get() {
             textDisplay.style.display = 'none';
             const subtitle = document.getElementById('subtitle');
             if (subtitle) subtitle.style.display = '';
+            lastDecrypted = null;
             return;
         }
 
@@ -120,20 +123,30 @@ async function get() {
             if (payload.ephemeralPublicKey && payload.iv && payload.encryptedDataBase64 && window.ReverseQr.privateKey) {
                 // Decrypt
                 const decrypted = await decryptPayload(payload, window.ReverseQr.privateKey);
-                textDisplay.textContent = decrypted;
-                textDisplay.style.display = 'block';
+
+                if (decrypted !== lastDecrypted) {
+                    // Add new textDisplay element
+                    const newTextDisplay = document.createElement('a');
+                    newTextDisplay.className = 'textDisplay';
+                    newTextDisplay.textContent = decrypted;
+                    newTextDisplay.style.display = 'block';
+                    // Check if decrypted is a valid URL
+                    try {
+                        const url = new URL(decrypted);
+                        newTextDisplay.href = url.href;
+                    } catch (e) {
+                        newTextDisplay.removeAttribute('href');
+                    }
+                    // Insert before the QR code
+                    const qrcodeDiv = document.getElementById('qrcode');
+                    qrcodeDiv.parentNode.insertBefore(newTextDisplay, qrcodeDiv);
+
+                    lastDecrypted = decrypted;
+                }
                 // Hide subtitle when data is present
                 const subtitle = document.getElementById('subtitle');
                 if (subtitle) subtitle.style.display = 'none';
-                // Check if decrypted is a valid URL
-                try {
-                    const url = new URL(decrypted);
-                    textDisplay.href = url.href;
-                } catch (e) {
-                    textDisplay.removeAttribute('href');
-                }
             } else {
-                
                 throw new Error(`missing or invalid payload structure`);
             }
         } else {
