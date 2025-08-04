@@ -80,23 +80,21 @@ sendButton.onclick = async () => {
     // Convert base64 to ArrayBuffer
     const publicKeyArrayBuffer = base64ToArrayBuffer(publicKeyBase64);
 
-    // Import recipient's public ECDH key
+    // Import recipient's public X25519 key
     const recipientPublicKey = await window.crypto.subtle.importKey(
         "spki",
         publicKeyArrayBuffer,
         {
-            name: "ECDH",
-            namedCurve: "P-256"
+            name: "X25519"
         },
         true,
         []
     );
 
-    // Generate ephemeral ECDH key pair
+    // Generate ephemeral X25519 key pair
     const ephemeralKeyPair = await window.crypto.subtle.generateKey(
         {
-            name: "ECDH",
-            namedCurve: "P-256"
+            name: "X25519"
         },
         true,
         ["deriveKey", "deriveBits"]
@@ -105,7 +103,7 @@ sendButton.onclick = async () => {
     // Derive shared secret
     const aesKey = await window.crypto.subtle.deriveKey(
         {
-            name: "ECDH",
+            name: "X25519",
             public: recipientPublicKey
         },
         ephemeralKeyPair.privateKey,

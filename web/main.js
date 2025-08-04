@@ -60,8 +60,7 @@ async function decryptPayload(payload, privateKey) {
         "spki",
         ephemeralPublicKeyArrayBuffer,
         {
-            name: "ECDH",
-            namedCurve: "P-256"
+            name: "X25519"
         },
         true,
         []
@@ -70,7 +69,7 @@ async function decryptPayload(payload, privateKey) {
     // Derive shared secret
     const aesKey = await window.crypto.subtle.deriveKey(
         {
-            name: "ECDH",
+            name: "X25519",
             public: ephemeralPublicKey
         },
         privateKey,
@@ -172,8 +171,7 @@ async function get() {
     if (!privateKeyBase64 || !publicKeyBase64) {
         keyPair = await window.crypto.subtle.generateKey(
             {
-                name: "ECDH",
-                namedCurve: "P-256"
+                name: "X25519"
             },
             true,
             ["deriveKey", "deriveBits"]
@@ -202,8 +200,7 @@ async function get() {
             "pkcs8",
             privateKeyArrayBuffer,
             {
-                name: "ECDH",
-                namedCurve: "P-256"
+                name: "X25519"
             },
             true,
             ["deriveKey", "deriveBits"]
@@ -214,8 +211,7 @@ async function get() {
             "spki",
             publicKeyArrayBuffer,
             {
-                name: "ECDH",
-                namedCurve: "P-256"
+                name: "X25519"
             },
             true,
             []
