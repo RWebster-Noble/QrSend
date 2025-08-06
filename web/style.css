@@ -173,3 +173,69 @@ button:hover {
     display: inline-block;
     /* box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5); */
 }
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: linear-gradient(135deg, #1a2332 0%, #23272f 100%);
+        color: #e3eafc;
+    }
+
+    #app {
+        background: #232b3a;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+    }
+
+    .page-title {
+        color: #6cb6ff;
+    }
+
+    .text-display {
+        background: #1a2233;
+        border-color: #6cb6ff;
+        color: #e3eafc;
+        box-shadow: 0 2px 12px rgba(108, 182, 255, 0.08);
+    }
+
+    .text-display[href] {
+        color: #6cb6ff;
+    }
+
+    .text-display[href]:hover {
+        color: #4094d6;
+    }
+
+    .text-display[href]:visited {
+        color: #b388ff;
+    }
+
+    #inputToSend {
+        background: #232b3a;
+        color: #e3eafc;
+        border-color: #3a4660;
+    }
+
+    #inputToSend:focus {
+        border-color: #6cb6ff;
+    }
+
+    #sendButton,
+    button {
+        background: #6cb6ff;
+        color: #232b3a;
+    }
+
+    #sendButton:hover,
+    button:hover {
+        background: #4094d6;
+    }
+
+    #sendButton:disabled {
+        background: #3a4660;
+        color: #b0b8c1;
+    }
+
+    .qr-instructions,
+    #qr-instructions {
+        color: #b0b8c1;
+    }
+}
