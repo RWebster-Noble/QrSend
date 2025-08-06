@@ -71,7 +71,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 32px auto 0 auto;
     text-align: center;
     width: 100%;
 }
@@ -97,7 +96,7 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 32px auto 0 auto;
+    margin: 0 auto; 
     text-align: center;
     width: 100%;
 }
@@ -165,4 +164,12 @@ button:hover {
     color: #eaeaea;
     cursor: not-allowed;
     opacity: 0.7;
+}
+
+.qrcode-bg {
+    background: #fff;
+    padding: 12px 12px;
+    border-radius: 12px;
+    display: inline-block;
+    /* box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5); */
 }
