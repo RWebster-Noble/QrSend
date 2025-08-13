@@ -24,7 +24,7 @@ export default async function handler(request: Request, context: Context) {
         });
     }
 
-    const store = getStore({ name: 'send', consistency: 'strong' });
+    const store = getStore({ name: 'send', consistency: 'eventual' });
     const data = await store.get(id);
 
     if (data === undefined || data === null) {
