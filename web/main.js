@@ -182,9 +182,11 @@ async function get() {
                 throw new Error(`Error ${response.status}: ${data.errorMessage}`);
             }
         }
-
+        
+        textDisplay.style.display = '';
     } catch (error) {
         textDisplay.textContent = `Error: ${error.message}`;
+        textDisplay.style.display = 'none';
     }
 }
 
