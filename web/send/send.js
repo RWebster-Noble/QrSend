@@ -147,6 +147,11 @@ sendButton.onclick = async () => {
         iv: ivBase64,
         encryptedDataBase64: encryptedDataBase64
     };
+    const payloadJsonString = JSON.stringify(payload);
+    if(payloadJsonString.length > 2048) {
+        alert('Message is too large to send!');
+        return;
+    }
 
     try {
         const response = await fetch(`/.netlify/functions/send/${id}`, {

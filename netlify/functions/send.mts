@@ -34,6 +34,15 @@ export default async function handler(request: Request, context: Context) {
             headers: { 'Content-Type': 'application/json' }
         });
     }
+    else if (body.length > 2048) {
+        return new Response(JSON.stringify({
+            errorType: "Error",
+            errorMessage: "Message is too large to send!"
+        }), {
+            status: 413,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
 
     const store = getStore({ name: 'send', consistency: 'strong' });
     // Extract ID from the request URL path
