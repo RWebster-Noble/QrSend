@@ -100,26 +100,22 @@ async function decryptPayload(payload, privateKey) {
     return decoder.decode(decryptedArrayBuffer);
 }
 
-let lastDecrypted = null;
+let lastRecieved = null;
+const qrcodeDiv = document.getElementById('qrcode-bg');
 
 async function get() {
     try {
         const publicKeyAsGuid = await uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
-        const response = await fetch(`/.netlify/functions/get?p=${publicKeyAsGuid}`);
+        const url = `/.netlify/functions/get?p=${publicKeyAsGuid}` + (lastRecieved ? `&k=${lastRecieved}` : '');
+        const response = await fetch(url);
 
         if (response.status === 204) {
-            textDisplay.style.display = 'none';
-            lastDecrypted = null;
-            // Clear decrypted list if present
-            const decryptedList = document.getElementById('decryptedList');
-            if (decryptedList) decryptedList.innerHTML = '';
             return;
         }
 
         if (response.ok) {
             const responseJson = await response.json();
             const payload = responseJson.data;
-            const qrcodeDiv = document.getElementById('qrcode-bg');
 
             // If payload is an array of blobs
             if (Array.isArray(payload)) {
@@ -147,13 +143,12 @@ async function get() {
                     // Insert before the QR code
                     qrcodeDiv.parentNode.insertBefore(decryptedList, qrcodeDiv);
                 }
-                decryptedList.innerHTML = '';
+
                 for (const item of data) {
                     const entry = document.createElement('a');
                     entry.className = 'text-display';
                     entry.textContent = item.d;
                     entry.style.display = 'block';
-                    entry.dataset.key = item.k;
                     // Check if decrypted is a valid URL
                     try {
                         const url = new URL(item.d);
@@ -162,9 +157,10 @@ async function get() {
                         entry.removeAttribute('href');
                     }
                     decryptedList.appendChild(entry);
-                }
 
-                lastDecrypted = data.map(x => x.d).join('\n');
+                    lastRecieved = item.k.split('/')[1];
+                }
+                
             } else {
                 throw new Error(`missing or invalid payload structure`);
             }
