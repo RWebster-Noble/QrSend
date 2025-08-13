@@ -12,20 +12,20 @@ export default async function handler(request: Request, context: Context) {
         });
     }
 
-    let body;
+    let bodyText: string;
     try {
-        body = await request.body;
+        bodyText = await request.text();
     } catch (e) {
         return new Response(JSON.stringify({
             errorType: "Error",
-            errorMessage: "Invalid JSON payload"
+            errorMessage: "Invalid request body"
         }), {
             status: 400,
             headers: { 'Content-Type': 'application/json' }
         });
     }
 
-    if (!body) {
+    if (!bodyText) {
         return new Response(JSON.stringify({
             errorType: "Error",
             errorMessage: "Missing request body"
@@ -34,7 +34,7 @@ export default async function handler(request: Request, context: Context) {
             headers: { 'Content-Type': 'application/json' }
         });
     }
-    else if (body.length > 2048) {
+    else if (bodyText.length > 2048) {
         return new Response(JSON.stringify({
             errorType: "Error",
             errorMessage: "Message is too large to send!"
@@ -63,7 +63,7 @@ export default async function handler(request: Request, context: Context) {
     }
 
     const timestamp = Math.floor(Date.now() / 1000);
-    await store.set(`${id}/${timestamp}`, body, { onlyIfNew: true, metadata: { timestamp } });
+    await store.set(`${id}/${timestamp}`, bodyText, { onlyIfNew: true, metadata: { timestamp } });
 
     // For now, just return a success response.
     return new Response(JSON.stringify({
