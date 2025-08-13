@@ -120,7 +120,7 @@ async function get() {
 
         if (response.ok) {
             const responseJson = await response.json();
-            const payload = JSON.parse(responseJson.data);
+            const payload = responseJson.data;
             const qrcodeDiv = document.getElementById('qrcode');
 
             // If payload is an array of blobs
@@ -182,7 +182,7 @@ async function get() {
                 throw new Error(`Error ${response.status}: ${data.errorMessage}`);
             }
         }
-        
+
         textDisplay.style.display = '';
     } catch (error) {
         textDisplay.textContent = `Error: ${error.message}`;
