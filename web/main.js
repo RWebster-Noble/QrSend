@@ -1,5 +1,7 @@
 window.ReverseQr = window.ReverseQr || {};
 
+const textDisplay = document.getElementById('textDisplay');
+
 // Convert ArrayBuffer to Base64 string
 function arrayBufferToBase64(arrayBuffer) {
     // Create a Uint8Array view of the ArrayBuffer
@@ -47,8 +49,33 @@ async function uint8ArrayToGuid(arrayBuffer) {
     ].join('-');
 }
 
-const refreshButton = document.getElementById('refreshButton');
+const clearButton = document.getElementById('clearButton');
+clearButton.onclick = async () => {
+    clearButton.disabled = true;
+    try {
+        const publicKeyAsGuid = await uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
+        const url = `/.netlify/functions/clear?p=${publicKeyAsGuid}`;
+        const response = await fetch(url, { method: 'DELETE' });
+        if (!response.ok) {
+            throw new Error(`Error: Failed to call clear. Status: ${response.status}`);
+        } else {
+            // Optionally, refresh UI after clear
+            if (document.getElementById('decryptedList')) {
+                document.getElementById('decryptedList').innerHTML = '';
+            }
+            lastRecieved = null;
+            clearButton.style.display = 'none';
+        }
+    } catch (e) {
+        textDisplay.style.display = '';
+        textDisplay.textContent = `Clear error: ${e.message}`;
+    } finally {
+        textDisplay.style.display = 'none';
+        clearButton.disabled = false;
+    }
+};
 
+const refreshButton = document.getElementById('refreshButton');
 refreshButton.onclick = async () => {
     get();
 };
@@ -160,7 +187,8 @@ async function get() {
 
                     lastRecieved = item.k.split('/')[1];
                 }
-                
+
+                clearButton.style.display = '';
             } else {
                 throw new Error(`missing or invalid payload structure`);
             }
