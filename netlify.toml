@@ -3,3 +3,6 @@ publish = "web"
 
 [functions]
 node_bundler = "esbuild"
+
+[functions."scheduled_deleteold"]
+schedule = "@daily"
