@@ -24,8 +24,9 @@ export default async function handler(request: Request, context: Context) {
         });
     }
 
-    const store = getStore({ name: 'send', consistency: 'eventual' });
+    const store = getStore({ name: 'send', consistency: 'strong' });
     const { blobs } = await store.list({ prefix: `${id}/` });
+
 
     if (!blobs || blobs.length === 0) {
         return new Response(null, {

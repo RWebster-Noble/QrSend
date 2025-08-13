@@ -44,7 +44,7 @@ export default async function handler(request: Request, context: Context) {
         });
     }
 
-    const store = getStore({ name: 'send', consistency: 'eventual' });
+    const store = getStore({ name: 'send', consistency: 'strong' });
     // Extract ID from the request URL path
     const url = new URL(request.url);
     // The path is like "/.netlify/functions/send/{id}"

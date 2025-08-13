@@ -109,8 +109,6 @@ async function get() {
 
         if (response.status === 204) {
             textDisplay.style.display = 'none';
-            const subtitle = document.getElementById('subtitle');
-            if (subtitle) subtitle.style.display = '';
             lastDecrypted = null;
             // Clear decrypted list if present
             const decryptedList = document.getElementById('decryptedList');
@@ -121,19 +119,19 @@ async function get() {
         if (response.ok) {
             const responseJson = await response.json();
             const payload = responseJson.data;
-            const qrcodeDiv = document.getElementById('qrcode');
+            const qrcodeDiv = document.getElementById('qrcode-bg');
 
             // If payload is an array of blobs
-            if (Array.isArray(payload.blobs)) {
+            if (Array.isArray(payload)) {
                 // Sort blobs by descending timestamp (k)
-                const sortedBlobs = payload.blobs.slice().sort((a, b) => b.k - a.k);
+                const sortedBlobs = payload.slice().sort((a, b) => b.k - a.k);
 
                 const data = [];
                 for (const blob of sortedBlobs) {
                     // Assume blob.d is encrypted, decrypt if needed
-                    const payload = blob.d;
-                    if (payload.e && payload.i && payload.d && window.ReverseQr.privateKey) {
-                        const decrypted = await decryptPayload(payload, window.ReverseQr.privateKey);
+                    const blobPayload = JSON.parse(blob.d);
+                    if (blobPayload.e && blobPayload.i && blobPayload.c && window.ReverseQr.privateKey) {
+                        const decrypted = await decryptPayload(blobPayload, window.ReverseQr.privateKey);
                         data.push({
                             k: blob.k,
                             d: decrypted
@@ -166,9 +164,6 @@ async function get() {
                     decryptedList.appendChild(entry);
                 }
 
-                // Hide subtitle when data is present
-                const subtitle = document.getElementById('subtitle');
-                if (subtitle) subtitle.style.display = 'none';
                 lastDecrypted = data.map(x => x.d).join('\n');
             } else {
                 throw new Error(`missing or invalid payload structure`);
@@ -183,10 +178,10 @@ async function get() {
             }
         }
 
-        textDisplay.style.display = '';
+        textDisplay.style.display = 'none';
     } catch (error) {
         textDisplay.textContent = `Error: ${error.message}`;
-        textDisplay.style.display = 'none';
+        textDisplay.style.display = '';
     }
 }
 
