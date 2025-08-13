@@ -25,11 +25,20 @@ export default async function handler(request: Request, context: Context) {
     }
 
     const store = getStore({ name: 'send', consistency: 'eventual' });
-    const data = await store.get(id);
+    const { blobs } = await store.list({ prefix: `${id}/` });
 
-    if (data === undefined || data === null) {
+    if (!blobs || blobs.length === 0) {
         return new Response(null, {
             status: 204
+        });
+    }
+
+    const data: { k: string; d: string }[] = [];
+    for (const blob of blobs) {
+        const d = await store.get(blob.key);
+        data.push({
+            k: blob.key,
+            d: d
         });
     }
 

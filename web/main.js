@@ -55,7 +55,7 @@ refreshButton.onclick = async () => {
 
 async function decryptPayload(payload, privateKey) {
     // Import ephemeral public key
-    const ephemeralPublicKeyArrayBuffer = base64ToArrayBuffer(payload.ephemeralPublicKey);
+    const ephemeralPublicKeyArrayBuffer = base64ToArrayBuffer(payload.e);
     const ephemeralPublicKey = await window.crypto.subtle.importKey(
         "spki",
         ephemeralPublicKeyArrayBuffer,
@@ -82,8 +82,8 @@ async function decryptPayload(payload, privateKey) {
     );
 
     // Decode IV and ciphertext
-    const iv = new Uint8Array(base64ToArrayBuffer(payload.iv));
-    const encryptedData = base64ToArrayBuffer(payload.encryptedDataBase64);
+    const iv = new Uint8Array(base64ToArrayBuffer(payload.i));
+    const encryptedData = base64ToArrayBuffer(payload.c);
 
     // Decrypt
     const decryptedArrayBuffer = await window.crypto.subtle.decrypt(
@@ -112,39 +112,64 @@ async function get() {
             const subtitle = document.getElementById('subtitle');
             if (subtitle) subtitle.style.display = '';
             lastDecrypted = null;
+            // Clear decrypted list if present
+            const decryptedList = document.getElementById('decryptedList');
+            if (decryptedList) decryptedList.innerHTML = '';
             return;
         }
 
         if (response.ok) {
             const responseJson = await response.json();
             const payload = JSON.parse(responseJson.data);
-            // Check if payload is encrypted
-            if (payload.ephemeralPublicKey && payload.iv && payload.encryptedDataBase64 && window.ReverseQr.privateKey) {
-                // Decrypt
-                const decrypted = await decryptPayload(payload, window.ReverseQr.privateKey);
+            const qrcodeDiv = document.getElementById('qrcode');
 
-                if (decrypted !== lastDecrypted) {
-                    // Add new textDisplay element
-                    const newTextDisplay = document.createElement('a');
-                    newTextDisplay.className = 'text-display';
-                    newTextDisplay.textContent = decrypted;
-                    newTextDisplay.style.display = 'block';
+            // If payload is an array of blobs
+            if (Array.isArray(payload.blobs)) {
+                // Sort blobs by descending timestamp (k)
+                const sortedBlobs = payload.blobs.slice().sort((a, b) => b.k - a.k);
+
+                const data = [];
+                for (const blob of sortedBlobs) {
+                    // Assume blob.d is encrypted, decrypt if needed
+                    const payload = blob.d;
+                    if (payload.e && payload.i && payload.d && window.ReverseQr.privateKey) {
+                        const decrypted = await decryptPayload(payload, window.ReverseQr.privateKey);
+                        data.push({
+                            k: blob.k,
+                            d: decrypted
+                        });
+                    }
+                }
+
+                // Render/update the list
+                let decryptedList = document.getElementById('decryptedList');
+                if (!decryptedList) {
+                    decryptedList = document.createElement('div');
+                    decryptedList.id = 'decryptedList';
+                    // Insert before the QR code
+                    qrcodeDiv.parentNode.insertBefore(decryptedList, qrcodeDiv);
+                }
+                decryptedList.innerHTML = '';
+                for (const item of data) {
+                    const entry = document.createElement('a');
+                    entry.className = 'text-display';
+                    entry.textContent = item.d;
+                    entry.style.display = 'block';
+                    entry.dataset.key = item.k;
                     // Check if decrypted is a valid URL
                     try {
-                        const url = new URL(decrypted);
-                        newTextDisplay.href = url.href;
+                        const url = new URL(item.d);
+                        entry.href = url.href;
                     } catch (e) {
-                        newTextDisplay.removeAttribute('href');
+                        entry.removeAttribute('href');
                     }
-                    // Insert before the QR code
-                    const qrcodeDiv = document.getElementById('qrcode');
-                    qrcodeDiv.parentNode.insertBefore(newTextDisplay, qrcodeDiv);
-
-                    lastDecrypted = decrypted;
+                    decryptedList.appendChild(entry);
                 }
+
                 // Hide subtitle when data is present
                 const subtitle = document.getElementById('subtitle');
                 if (subtitle) subtitle.style.display = 'none';
+                lastDecrypted = data.map(x => x.d).join('\n');
             } else {
                 throw new Error(`missing or invalid payload structure`);
             }

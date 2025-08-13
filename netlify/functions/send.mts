@@ -61,7 +61,10 @@ export default async function handler(request: Request, context: Context) {
             headers: { 'Content-Type': 'application/json' }
         });
     }
-    await store.set(id, body);
+
+    const timestamp = Math.floor(Date.now() / 1000);
+    await store.set(`${id}/${timestamp}`, body, { onlyIfNew: true, metadata: { timestamp } });
+
     // For now, just return a success response.
     return new Response(JSON.stringify({
         success: true,

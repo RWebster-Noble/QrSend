@@ -143,10 +143,11 @@ sendButton.onclick = async () => {
     // Convert ArrayBuffer to GUID for endpoint
     const id = await uint8ArrayToGuid(publicKeyArrayBuffer);
     const payload = {
-        ephemeralPublicKey: ephemeralPublicKeyBase64,
-        iv: ivBase64,
-        encryptedDataBase64: encryptedDataBase64
+        e: ephemeralPublicKeyBase64,
+        i: ivBase64,
+        c: encryptedDataBase64
     };
+
     const payloadJsonString = JSON.stringify(payload);
     if(payloadJsonString.length > 2048) {
         alert('Message is too large to send!');
@@ -159,7 +160,7 @@ sendButton.onclick = async () => {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(payload)
+            body: payloadJsonString
         });
 
         if (response.ok) {
