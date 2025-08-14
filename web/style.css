@@ -12,7 +12,7 @@
 
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: linear-gradient(135deg, #e3eafc 0%, #f7f7f7 100%);
+    background-color: #e3eafc;
     margin: 0;
     padding: 0;
 }
@@ -199,7 +199,7 @@ button:hover {
 
 @media (prefers-color-scheme: dark) {
     body {
-        background: linear-gradient(135deg, #1a2332 0%, #23272f 100%);
+        background-color: #1a2332;
         color: #e3eafc;
     }
 
