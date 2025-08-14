@@ -75,7 +75,6 @@ body {
     width: 100%;
 }
 
-
 button {
     background: #0078d7;
     color: #fff;
@@ -90,15 +89,6 @@ button {
 
 button:hover {
     background: #005fa3;
-}
-
-#qrcode {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto; 
-    text-align: center;
-    width: 100%;
 }
 
 .sent-animate {
@@ -151,7 +141,7 @@ button:hover {
     cursor: pointer;
     transition: background 0.2s, opacity 0.2s;
     box-shadow: 0 2px 8px rgba(0, 120, 215, 0.08);
-    width: 120px; /* Fixed width */
+    width: 120px/* Fixed width */;
 }
 
 #sendButton:hover {
@@ -171,7 +161,7 @@ button:hover {
     padding: 12px 12px;
     border-radius: 12px;
     display: inline-block;
-    /* box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5); */
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
 #qr-link {
@@ -205,7 +195,7 @@ button:hover {
 
     #app {
         background: #232b3a;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
     }
 
     .page-title {
