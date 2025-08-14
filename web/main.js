@@ -283,6 +283,12 @@ async function get() {
         correctLevel: QRCode.CorrectLevel.M
     });
 
+    // Show the QR code link below the QR code
+    const qrLinkDiv = document.getElementById('qr-link');
+    if (qrLinkDiv) {
+        qrLinkDiv.innerHTML = `<a href="${qrCodeUrl}" target="_blank" rel="noopener">${qrCodeUrl}</a>`;
+    }
+
     get();
     setInterval(get, 1000);
 })();
