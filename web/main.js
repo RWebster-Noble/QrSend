@@ -325,11 +325,19 @@ async function get(publicKeyAsGuid) {
 
     const publicKeyAsGuid = await uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
 
+    get(publicKeyAsGuid);
+
     var pusher = new Pusher('ea9a389fb0213a15b340', {
         cluster: 'us2'
     });
 
-    get(publicKeyAsGuid);
+    // Show refresh button if Pusher fails to connect
+    pusher.connection.bind('error', function() {
+        refreshButton.style.display = '';
+    });
+    pusher.connection.bind('failed', function() {
+        refreshButton.style.display = '';
+    });
 
     var channel = pusher.subscribe(publicKeyAsGuid);
     channel.bind('update', async (data, metadata) => {
