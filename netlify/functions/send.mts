@@ -1,6 +1,10 @@
 import { getStore } from '@netlify/blobs';
 import { Context } from '@netlify/functions';
 
+import Pusher from 'pusher';
+
+
+
 export default async function handler(request: Request, context: Context) {
     if (request.method !== 'POST') {
         return new Response(JSON.stringify({
@@ -64,6 +68,26 @@ export default async function handler(request: Request, context: Context) {
 
     const timestamp = Math.floor(Date.now() / 1000);
     await store.set(`${id}/${timestamp}`, bodyText, { onlyIfNew: true, metadata: { timestamp } });
+
+    if (!process.env.PUSHER_APP_ID) {
+    throw new Error('PUSHER_APP_ID environment variable is required');
+    }
+    if (!process.env.PUSHER_APP_KEY) {
+    throw new Error('PUSHER_APP_KEY environment variable is required');
+    }
+    if (!process.env.PUSHER_APP_SECRET) {
+    throw new Error('PUSHER_APP_SECRET environment variable is required');
+    }
+
+    const pusher = new Pusher({
+        appId: process.env.PUSHER_APP_ID,
+        key: process.env.PUSHER_APP_KEY,
+        secret: process.env.PUSHER_APP_SECRET,
+        cluster: "us2",
+        useTLS: true
+    });
+
+    pusher.trigger(id, "update", {});
 
     // For now, just return a success response.
     return new Response(JSON.stringify({

@@ -53,7 +53,6 @@ const clearButton = document.getElementById('clearButton');
 clearButton.onclick = async () => {
     clearButton.disabled = true;
     try {
-        const publicKeyAsGuid = await uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
         const url = `/.netlify/functions/clear?p=${publicKeyAsGuid}`;
         const response = await fetch(url, { method: 'DELETE' });
         if (!response.ok) {
@@ -127,89 +126,88 @@ async function decryptPayload(payload, privateKey) {
     return decoder.decode(decryptedArrayBuffer);
 }
 
-let lastRecieved = null;
-const qrcodeDiv = document.getElementById('qrcode-bg');
-
-async function get() {
-    try {
-        const publicKeyAsGuid = await uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
-        const url = `/.netlify/functions/get?p=${publicKeyAsGuid}` + (lastRecieved ? `&k=${lastRecieved}` : '');
-        const response = await fetch(url);
-
-        if (response.status === 204) {
-            return;
-        }
-
-        if (response.ok) {
-            const responseJson = await response.json();
-            const payload = responseJson.data;
-
-            // If payload is an array of blobs
-            if (Array.isArray(payload)) {
-                // Sort blobs by descending timestamp (k)
-                const sortedBlobs = payload.slice().sort((a, b) => b.k - a.k);
-
-                const data = [];
-                for (const blob of sortedBlobs) {
-                    // Assume blob.d is encrypted, decrypt if needed
-                    const blobPayload = JSON.parse(blob.d);
-                    if (blobPayload.e && blobPayload.i && blobPayload.c && window.ReverseQr.privateKey) {
-                        const decrypted = await decryptPayload(blobPayload, window.ReverseQr.privateKey);
-                        data.push({
-                            k: blob.k,
-                            d: decrypted
-                        });
-                    }
-                }
-
-                // Render/update the list
-                let decryptedList = document.getElementById('decryptedList');
-                if (!decryptedList) {
-                    decryptedList = document.createElement('div');
-                    decryptedList.id = 'decryptedList';
-                    // Insert before the QR code
-                    qrcodeDiv.parentNode.insertBefore(decryptedList, qrcodeDiv);
-                }
-
-                for (const item of data) {
-                    const entry = document.createElement('a');
-                    entry.className = 'text-display';
-                    entry.textContent = item.d;
-                    entry.style.display = 'block';
-                    // Check if decrypted is a valid URL
-                    try {
-                        const url = new URL(item.d);
-                        entry.href = url.href;
-                    } catch (e) {
-                        entry.removeAttribute('href');
-                    }
-                    decryptedList.appendChild(entry);
-
-                    lastRecieved = item.k.split('/')[1];
-                }
-
-                clearButton.style.display = '';
-            } else {
-                throw new Error(`missing or invalid payload structure`);
-            }
-        } else {
-            const data = await response.json();
-            if (!data) {
-                throw new Error(`Error: Status ${response.status}`);
-            }
-            if (data.errorType === "Error") {
-                throw new Error(`Error ${response.status}: ${data.errorMessage}`);
-            }
-        }
-
-        textDisplay.style.display = 'none';
-    } catch (error) {
-        textDisplay.textContent = `Error: ${error.message}`;
-        textDisplay.style.display = '';
-    }
-}
-
 (async function () {
+    let lastRecieved = null;
+    const qrcodeDiv = document.getElementById('qrcode-bg');
+
+    async function get() {
+        try {
+            const url = `/.netlify/functions/get?p=${publicKeyAsGuid}` + (lastRecieved ? `&k=${lastRecieved}` : '');
+            const response = await fetch(url);
+
+            if (response.status === 204) {
+                return;
+            }
+
+            if (response.ok) {
+                const responseJson = await response.json();
+                const payload = responseJson.data;
+
+                // If payload is an array of blobs
+                if (Array.isArray(payload)) {
+                    // Sort blobs by descending timestamp (k)
+                    const sortedBlobs = payload.slice().sort((a, b) => b.k - a.k);
+
+                    const data = [];
+                    for (const blob of sortedBlobs) {
+                        // Assume blob.d is encrypted, decrypt if needed
+                        const blobPayload = JSON.parse(blob.d);
+                        if (blobPayload.e && blobPayload.i && blobPayload.c && window.ReverseQr.privateKey) {
+                            const decrypted = await decryptPayload(blobPayload, window.ReverseQr.privateKey);
+                            data.push({
+                                k: blob.k,
+                                d: decrypted
+                            });
+                        }
+                    }
+
+                    // Render/update the list
+                    let decryptedList = document.getElementById('decryptedList');
+                    if (!decryptedList) {
+                        decryptedList = document.createElement('div');
+                        decryptedList.id = 'decryptedList';
+                        // Insert before the QR code
+                        qrcodeDiv.parentNode.insertBefore(decryptedList, qrcodeDiv);
+                    }
+
+                    for (const item of data) {
+                        const entry = document.createElement('a');
+                        entry.className = 'text-display';
+                        entry.textContent = item.d;
+                        entry.style.display = 'block';
+                        // Check if decrypted is a valid URL
+                        try {
+                            const url = new URL(item.d);
+                            entry.href = url.href;
+                        } catch (e) {
+                            entry.removeAttribute('href');
+                        }
+                        decryptedList.appendChild(entry);
+
+                        lastRecieved = item.k.split('/')[1];
+                    }
+
+                    clearButton.style.display = '';
+                } else {
+                    throw new Error(`missing or invalid payload structure`);
+                }
+            } else {
+                const data = await response.json();
+                if (!data) {
+                    throw new Error(`Error: Status ${response.status}`);
+                }
+                if (data.errorType === "Error") {
+                    throw new Error(`Error ${response.status}: ${data.errorMessage}`);
+                }
+            }
+
+            textDisplay.style.display = 'none';
+        } catch (error) {
+            textDisplay.textContent = `Error: ${error.message}`;
+            textDisplay.style.display = '';
+        }
+    }
+
     let keyPair;
     let privateKeyBase64 = localStorage.getItem('privateKey');
     let publicKeyBase64 = localStorage.getItem('publicKey');
@@ -272,7 +270,7 @@ async function get() {
         .replace(/\//g, '_')
         .replace(/=/g, '');
 
-    const qrCodeUrl = `${window.location.href}send#${urlsafePublicKeyBase64}`;
+    const qrCodeUrl = `${window.location.href}send/#${urlsafePublicKeyBase64}`;
     console.log("QR Code URL:", qrCodeUrl);
     new QRCode(document.getElementById("qrcode"), {
         text: qrCodeUrl,
@@ -289,6 +287,16 @@ async function get() {
         qrLinkDiv.innerHTML = `<a href="${qrCodeUrl}" target="_blank" rel="noopener">${qrCodeUrl}</a>`;
     }
 
+    const publicKeyAsGuid = await uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
+
+    var pusher = new Pusher('ea9a389fb0213a15b340', {
+        cluster: 'us2'
+    });
+
     get();
-    setInterval(get, 1000);
+
+    var channel = pusher.subscribe(publicKeyAsGuid);
+    channel.bind('update', function (_data) {
+        get();
+    });
 })();
