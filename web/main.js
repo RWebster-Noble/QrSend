@@ -177,10 +177,16 @@ async function processPayloads(payloads, privateKey, qrcodeDiv) {
         entry.textContent = item.d;
         entry.style.display = 'block';
 
-        // Check if decrypted is a valid URL
+        // Check if decrypted is a valid and safe URL
         try {
             const url = new URL(item.d);
-            entry.href = url.href;
+            const allowedProtocols = ['http:', 'https:', 'mailto:'];
+            if (allowedProtocols.includes(url.protocol)) {
+                entry.href = url.href;
+                entry.rel = 'noopener';
+            } else {
+                entry.removeAttribute('href');
+            }
         } catch (e) {
             entry.removeAttribute('href');
         }
@@ -320,7 +326,13 @@ async function get(publicKeyAsGuid) {
     // Show the QR code link below the QR code
     const qrLinkDiv = document.getElementById('qr-link');
     if (qrLinkDiv) {
-        qrLinkDiv.innerHTML = `<a href="${qrCodeUrl}" target="_blank" rel="noopener">${qrCodeUrl}</a>`;
+        qrLinkDiv.innerHTML = '';
+        const link = document.createElement('a');
+        link.href = qrCodeUrl;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.textContent = qrCodeUrl;
+        qrLinkDiv.appendChild(link);
     }
 
     const publicKeyAsGuid = await uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
