@@ -70,13 +70,13 @@ export default async function handler(request: Request, context: Context) {
     await store.set(`${id}/${timestamp}`, bodyText, { onlyIfNew: true, metadata: { timestamp } });
 
     if (!process.env.PUSHER_APP_ID) {
-    throw new Error('PUSHER_APP_ID environment variable is required');
+        throw new Error('PUSHER_APP_ID environment variable is required');
     }
     if (!process.env.PUSHER_APP_KEY) {
-    throw new Error('PUSHER_APP_KEY environment variable is required');
+        throw new Error('PUSHER_APP_KEY environment variable is required');
     }
     if (!process.env.PUSHER_APP_SECRET) {
-    throw new Error('PUSHER_APP_SECRET environment variable is required');
+        throw new Error('PUSHER_APP_SECRET environment variable is required');
     }
 
     const pusher = new Pusher({
@@ -87,7 +87,6 @@ export default async function handler(request: Request, context: Context) {
         useTLS: true
     });
 
-    pusher.trigger(id, "update", {});
     pusher.trigger(id, "update", bodyText);
 
     // For now, just return a success response.
