@@ -1,11 +1,9 @@
-#qr-instructions,
 .qr-instructions {
     display: block;
     text-align: center;
     font-size: 1.05rem;
     color: #555;
     margin: 0 auto 0 auto;
-    max-width: 380px;
     line-height: 1.5;
     font-weight: 500;
 }
@@ -61,7 +59,7 @@ body {
 .page-title {
     font-size: 2.2rem;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 32px;
     margin-top: 0px;
     color: #0078d7;
     letter-spacing: 1px;
@@ -83,7 +81,6 @@ button {
     padding: 10px 24px;
     font-size: 18px;
     cursor: pointer;
-    margin: 10px 0;
     transition: background 0.2s;
 }
 
