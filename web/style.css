@@ -187,6 +187,28 @@ button:hover {
     color: #551A8B;
 }
 
+.github-link {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 1000;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    display: inline-block;
+}
+
+.github-link:hover,
+.github-link:focus {
+    opacity: 1;
+}
+
+.github-link img {
+    display: block;
+    width: 32px;
+    height: 32px;
+    /* No border or background for subtlety */
+}
+
 @media (prefers-color-scheme: dark) {
     body {
         background-color: #1a2332;
