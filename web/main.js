@@ -1,4 +1,4 @@
-window.ReverseQr = window.ReverseQr || {};
+window.QrSend = window.QrSend || {};
 
 const textDisplay = document.getElementById('textDisplay');
 
@@ -53,7 +53,7 @@ const clearButton = document.getElementById('clearButton');
 clearButton.onclick = async () => {
     clearButton.disabled = true;
     try {
-        const publicKeyAsGuid = await uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
+        const publicKeyAsGuid = await uint8ArrayToGuid(window.QrSend.publicKeyArrayBuffer);
         const url = `/.netlify/functions/clear?p=${publicKeyAsGuid}`;
         const response = await fetch(url, { method: 'DELETE' });
         if (!response.ok) {
@@ -222,7 +222,7 @@ async function get(publicKeyAsGuid) {
             if (Array.isArray(payload)) {
                 const latestTimestamp = await processPayloads(
                     payload,
-                    window.ReverseQr.privateKey,
+                    window.QrSend.privateKey,
                     qrcodeDiv
                 );
 
@@ -276,8 +276,8 @@ async function get(publicKeyAsGuid) {
             keyPair.publicKey
         );
         publicKeyBase64 = arrayBufferToBase64(publicKeyArrayBuffer);
-        window.ReverseQr.publicKeyArrayBuffer = publicKeyArrayBuffer;
-        window.ReverseQr.privateKey = keyPair.privateKey;
+        window.QrSend.publicKeyArrayBuffer = publicKeyArrayBuffer;
+        window.QrSend.privateKey = keyPair.privateKey;
         localStorage.setItem('publicKey', publicKeyBase64);
     } else {
         // Import private key
@@ -302,9 +302,9 @@ async function get(publicKeyAsGuid) {
             true,
             []
         );
-        window.ReverseQr.publicKeyArrayBuffer = publicKeyArrayBuffer;
+        window.QrSend.publicKeyArrayBuffer = publicKeyArrayBuffer;
         keyPair = { privateKey, publicKey };
-        window.ReverseQr.privateKey = privateKey; // <-- Save for decryption
+        window.QrSend.privateKey = privateKey; // <-- Save for decryption
     }
 
     const urlsafePublicKeyBase64 = publicKeyBase64
@@ -335,7 +335,7 @@ async function get(publicKeyAsGuid) {
         qrLinkDiv.appendChild(link);
     }
 
-    const publicKeyAsGuid = await uint8ArrayToGuid(window.ReverseQr.publicKeyArrayBuffer);
+    const publicKeyAsGuid = await uint8ArrayToGuid(window.QrSend.publicKeyArrayBuffer);
 
     get(publicKeyAsGuid);
 
@@ -362,7 +362,7 @@ async function get(publicKeyAsGuid) {
 
             const latestTimestamp = await processPayloads(
                 singlePayload,
-                window.ReverseQr.privateKey,
+                window.QrSend.privateKey,
                 qrcodeDiv
             );
 
