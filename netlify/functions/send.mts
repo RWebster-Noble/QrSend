@@ -87,6 +87,7 @@ export default async function handler(request: Request, context: Context) {
         useTLS: true
     });
 
+    pusher.trigger(id, "update", {});
     pusher.trigger(id, "update", bodyText);
 
     // For now, just return a success response.
