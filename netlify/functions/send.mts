@@ -88,6 +88,8 @@ export default async function handler(request: Request, context: Context) {
     });
 
     pusher.trigger(id, "update", bodyText);
+    await new Promise(resolve => setTimeout(resolve, 250));
+    pusher.trigger(id, "update", {});
 
     // For now, just return a success response.
     return new Response(JSON.stringify({
