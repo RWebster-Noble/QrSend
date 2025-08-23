@@ -43,13 +43,18 @@ This project is designed to be deployed on [Netlify](https://www.netlify.com/).
 
 To run the project locally:
 
-1. Install the [Netlify CLI](https://docs.netlify.com/cli/get-started/):
+1. **Create a [Pusher](https://pusher.com/) account** and create a new Channels app.
+
+2. **Configure environment variables:**  
+   Copy `.env.example` to `.env` and enter your Pusher Channels App keys (App ID, Key, Secret):
+
+3. Install the [Netlify CLI](https://docs.netlify.com/cli/get-started/):
 
    ```
    npm install -g netlify-cli
    ```
 
-2. Start the local development server:
+4. Start the local development server:
 
    ```
    netlify dev
