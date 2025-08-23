@@ -87,9 +87,7 @@ export default async function handler(request: Request, context: Context) {
         useTLS: true
     });
 
-    pusher.trigger(id, "update", bodyText);
-    await new Promise(resolve => setTimeout(resolve, 250));
-    pusher.trigger(id, "update", {});
+    await pusher.trigger(id, "update", bodyText);
 
     // For now, just return a success response.
     return new Response(JSON.stringify({
