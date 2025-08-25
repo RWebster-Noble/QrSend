@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
+import { viteSingleFile } from 'vite-plugin-singlefile';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -35,6 +36,7 @@ export default defineConfig({
           dest: '.'
         }
       ]
-    })
+    }),
+  viteSingleFile()
   ]
 });
