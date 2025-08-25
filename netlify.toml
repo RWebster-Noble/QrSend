@@ -1,5 +1,7 @@
+
 [build]
 publish = "web"
+command = "npm run build"
 
 [functions]
 node_bundler = "esbuild"
