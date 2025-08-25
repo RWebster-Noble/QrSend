@@ -4,13 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
     <title>QR Send</title>
     <meta name="description"
         content="QR Send lets you instantly send text or links between devices using QR codes with end-to-end encryption. No sign-up or app required.">
     <link rel="stylesheet" href="style.css">
-    <script src="https://js.pusher.com/8.4.0/pusher.min.js"
-        integrity="sha256-hWIBB1Te8gmbEN43XUksASDnj2IeWCIuUQP8/SJIiRU="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 
 <body>
@@ -27,7 +25,6 @@
         <p class="qr-instructions">Open this on any other device to send text or links back here.</p>
     </div>
 
-    <!-- Subtle GitHub repo link -->
     <a href="https://github.com/RWebster-Noble/QrSend/" target="_blank" rel="noopener" class="github-link"
         aria-label="GitHub repository">
         <picture>
@@ -37,10 +34,12 @@
     </a>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
-        integrity="sha512-CNgIRecGo7nphbeZ04Sc13ka07paqdeTu0WR1IM4kNcpmBAUSHSQX0FslNhTDadL4O5SAGapGt4FodqL8My0mA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        integrity="sha256-xUHvBjJ4hahBW8qN9gceFBibSFUzbe9PNttUvehITzY="
+        crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <script src="https://js.pusher.com/8.4.0/pusher.min.js"
+        integrity="sha256-hWIBB1Te8gmbEN43XUksASDnj2IeWCIuUQP8/SJIiRU=" crossorigin="anonymous"
+        referrerpolicy="no-referrer" defer></script>
     <script src="main.js" defer></script>
 </body>
 
 </html>
-
