@@ -6,6 +6,6 @@
     "pusher": "^5.2.0"
   },
   "devDependencies": {
-    "netlify-cli": "^23.5.0"
+    "netlify-cli": "^23.5.1"
   }
 }
