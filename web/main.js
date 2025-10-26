@@ -49,6 +49,15 @@ async function uint8ArrayToGuid(arrayBuffer) {
     ].join('-');
 }
 
+// Function to select text content of an element
+function selectText(element) {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+}
+
 const clearButton = document.getElementById('clearButton');
 clearButton.onclick = async () => {
     clearButton.disabled = true;
@@ -171,12 +180,14 @@ async function processPayloads(payloads, privateKey, qrcodeDiv) {
         qrcodeDiv.parentNode.insertBefore(decryptedList, qrcodeDiv);
     }
 
+
     for (const item of decryptedData) {
         const entry = document.createElement('a');
         entry.className = 'text-display';
         entry.textContent = item.d;
         entry.style.display = 'block';
 
+        var isText = true;
         // Check if decrypted is a valid and safe URL
         try {
             const url = new URL(item.d);
@@ -184,11 +195,20 @@ async function processPayloads(payloads, privateKey, qrcodeDiv) {
             if (allowedProtocols.includes(url.protocol)) {
                 entry.href = url.href;
                 entry.rel = 'noopener';
+                isText = false;
             } else {
                 entry.removeAttribute('href');
             }
         } catch (e) {
             entry.removeAttribute('href');
+        }
+
+        if (isText) {
+            // Add click event listener to select text for non-URLs
+            entry.addEventListener('click', function (event) {
+                // Select the text content
+                selectText(this);
+            });
         }
 
         decryptedList.appendChild(entry);
