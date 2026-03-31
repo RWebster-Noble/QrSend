@@ -2,10 +2,10 @@
   "dependencies": {
     "@netlify/blobs": "^10.7.4",
     "@netlify/functions": "^5.1.5",
-    "netlify": "^24.3.0",
+    "netlify": "^24.8.1",
     "pusher": "^5.3.3"
   },
   "devDependencies": {
-    "netlify-cli": "^24.3.0"
+    "netlify-cli": "^24.8.1"
   }
 }
